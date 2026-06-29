@@ -1,14 +1,8 @@
-import { ThemeProvider, CssBaseline } from '@mui/material';
-import theme from './theme';
+import * as React from 'react';
 import DashboardPage from './pages/DashboardPage';
 
 function App() {
-  return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <DashboardPage />
-    </ThemeProvider>
-  );
+  return <DashboardPage />;
 }
 
 export default App;

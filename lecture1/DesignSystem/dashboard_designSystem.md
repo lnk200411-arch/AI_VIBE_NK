@@ -60,7 +60,6 @@
 - 용도: "QUICK ACTIONS", "CIRCLE ACTIVITY", "TODAY RESULTS"
 
 ```jsx
-// 섹션 레이블 스타일
 sx={{
   fontSize: '0.75rem',
   fontWeight: 600,
@@ -146,209 +145,34 @@ sx={{ mb: { xs: 3, md: 4 } }}
 
 ---
 
-## 3. 컴포넌트 스타일 가이드
+## 3. 레이아웃 시스템
 
-### 3.1 버튼 (Button)
-
-#### Pill CTA 버튼 (주요 액션)
-- 형태: 완전한 원형 모서리 (pill shape)
-- `border-radius`: 24px
-- 패딩: `py: 1.5, px: 3` (12px 24px)
-- 아이콘 + 텍스트 조합
-
-```jsx
-<Button
-  variant='contained'
-  startIcon={<PlayCircleIcon />}
-  sx={{
-    borderRadius: '24px',
-    py: 1.5,
-    px: 3,
-    fontSize: '0.9375rem',
-    fontWeight: 700,
-  }}
->
-  Get started
-</Button>
-```
-
-#### 더보기 버튼 (More)
-- 형태: 소형 pill 버튼
-- `border-radius`: 20px
-- 패딩: `py: 0.75, px: 2`
-
----
-
-### 3.2 카드 (Card)
-
-#### 메인 콘텐츠 카드
-- `border-radius`: 16–20px
-- 내부 패딩: `p: 3` (24px)
-
-```jsx
-<Card
-  sx={{
-    borderRadius: '20px',
-    p: 3,
-  }}
-/>
-```
-
-#### 운동/루틴 카드
-- `border-radius`: 16px
-- 이미지 영역 + 텍스트 영역 조합
-- 시간 표시 (`21 m`, `15 m`) 하단 고정
-- 최소 높이: `minHeight: '180px'`
-
-```jsx
-<Card
-  sx={{
-    borderRadius: '16px',
-    overflow: 'hidden',
-    position: 'relative',
-    minHeight: '180px',
-  }}
-/>
-```
-
-#### 하이라이트 카드
-- `border-radius`: 16px
-- 이미지가 카드 밖으로 넘치는 스타일 (`overflow: visible`)
-
----
-
-### 3.3 Quick Action 버튼 카드
-
-- 형태: 정사각형에 가까운 카드
-- `border-radius`: 12px
-- 구성: 아이콘(36×36px) + 레이블 텍스트 하단
-
-```jsx
-<Paper
-  sx={{
-    borderRadius: '12px',
-    p: 1.5,
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: 1,
-    cursor: 'pointer',
-    transition: 'transform 0.15s',
-    '&:hover': { transform: 'translateY(-2px)' },
-  }}
->
-  <Box sx={{ width: 36, height: 36 }}>{/* 아이콘 */}</Box>
-  <Typography variant='caption'>Heart rate</Typography>
-</Paper>
-```
-
----
-
-### 3.4 배지 / 태그 (Badge & Tag)
-
-#### 관계 배지 (Friends, Family 등)
-- 형태: pill shape (`border-radius`: 20px)
-- 크기: `py: 0.25, px: 1` (2px 8px)
-- 폰트: 10–11px, font-weight: 600
-- 높이: 20px
-
-```jsx
-<Chip
-  label='Friends'
-  size='small'
-  sx={{
-    borderRadius: '20px',
-    fontSize: '0.6875rem',
-    fontWeight: 600,
-    height: '20px',
-  }}
-/>
-```
-
-#### 유저 등급 배지 (Top user)
-- 형태: pill shape
-- 폰트: 11px, font-weight: 600
-
----
-
-### 3.5 사이드바 네비게이션
-
-#### 구조
-- 고정 너비: 200–220px
-- 상단: 로고 영역
-- 중간: 사용자 프로필 (아바타 + 이름 + 등급 배지)
-- 메인: 메뉴 리스트
-- 하단: 부가 메뉴 (Additional, Settings)
-
-#### 메뉴 아이템 스타일
-- 기본: 14px, font-weight 500
-- 활성: font-weight 700
-- 호버: 텍스트 진해짐
-
-```jsx
-// 사이드바 래퍼
-sx={{
-  width: '210px',
-  minHeight: '100vh',
-  p: 3,
-  display: 'flex',
-  flexDirection: 'column',
-  borderRadius: '20px 0 0 20px',
-}}
-
-// 메뉴 아이템
-sx={{
-  fontSize: '0.9375rem',
-  fontWeight: isActive ? 700 : 500,
-  py: 1.5,
-  px: 1,
-  borderRadius: '8px',
-  cursor: 'pointer',
-}}
-```
-
----
-
-### 3.6 통계 수치 표시 (Stat Display)
-
-```jsx
-<Box>
-  <Typography sx={{ fontSize: '2rem', fontWeight: 700, lineHeight: 1 }}>
-    84°
-  </Typography>
-  <Typography variant='caption'>
-    Your points
-  </Typography>
-</Box>
-```
-
----
-
-## 4. 레이아웃 시스템
-
-### 4.1 전체 페이지 구조
+### 3.1 전체 페이지 구조
 
 ```
 [대시보드 래퍼]  display: flex, minHeight: 100vh
   ├── [사이드바]  width: 210px, flex-shrink: 0
   │     ├── 로고
-  │     ├── 사용자 프로필
+  │     ├── 사용자 프로필 (아바타 + 이름 + 등급 배지)
   │     ├── 메뉴 리스트 (Dashboard, Trainings, Health, Circles, Friends)
   │     └── 하단 메뉴 (Additional, Settings)
   │
   └── [메인 콘텐츠]  flex: 1, overflow: auto
         ├── [상단 헤더]  페이지 제목 + 알림 아이콘 + 사용자 아바타 그룹
-        ├── [히어로 섹션]  제목 + 설명 + CTA 버튼
-        ├── [Quick Actions]  4열 그리드
-        ├── [주간 활동 차트]  바 차트 + 수치 요약
-        ├── [운동 카드 목록]  수평 스크롤 또는 3열 그리드
-        ├── [Circle Activity]  사용자 리스트 + 도넛 진행률
-        └── [Today Results]  버블/도넛 차트 + 범례
+        ├── [2단 그리드]
+        │     ├── [좌측 (7/12)]
+        │     │     ├── [히어로 섹션]  제목 + 설명 + CTA 버튼
+        │     │     ├── [Quick Actions]  4열 그리드
+        │     │     └── [Circle Activity]  사용자 리스트 + 도넛 진행률
+        │     └── [우측 (5/12)]
+        │           ├── [주간 활동 차트]  바 차트 + 수치 요약
+        │           ├── [운동 카드 목록]  색상 배경 카드 3개
+        │           └── [Today Results]  버블 차트 + 범례 + More 버튼
 ```
 
-### 4.2 그리드 시스템
+### 3.2 그리드 시스템
 
-#### Quick Actions 그리드 (4열 고정)
+#### Quick Actions 그리드 (4열)
 ```jsx
 <Grid container spacing={1.5}>
   {actions.map((action) => (
@@ -384,21 +208,32 @@ sx={{
 </Grid>
 ```
 
-### 4.3 컨테이너 설정
+### 3.3 컨테이너 설정
 
-| 영역 | 설정값 | 비고 |
-|------|--------|------|
-| 전체 대시보드 | `width: 100%, maxWidth: '1200px'` | 고정 너비 대시보드 |
-| 사이드바 | `width: '210px'` | 고정, flex-shrink: 0 |
-| 메인 콘텐츠 | `flex: 1, p: 3` | 유동 너비 |
-| 카드 내부 패딩 | `p: 2.5–3` | 콘텐츠 종류별 차등 |
+| 영역 | 너비 설정 | 패딩 | 비고 |
+|------|-----------|------|------|
+| 전체 대시보드 | `maxWidth: '1200px'` | `p: 2` | 고정 너비 대시보드 |
+| 사이드바 | `width: '210px'` | `p: 3` | flex-shrink: 0 |
+| 메인 콘텐츠 | `flex: 1` | `p: 3` | 유동 너비 |
+| 카드 내부 | — | `p: 2.5–3` | 콘텐츠 종류별 차등 |
 
-### 4.4 상단 헤더 패턴
+### 3.4 컴포넌트 크기 기준
+
+| 컴포넌트 | border-radius | 최소 높이 | 비고 |
+|----------|---------------|-----------|------|
+| 메인 콘텐츠 카드 | 20px | — | 주요 섹션 래퍼 |
+| 운동/루틴 카드 | 16px | 180px | 이미지 + 텍스트 조합 |
+| Quick Action 카드 | 12px | — | 정사각형 형태 |
+| 배지 / 태그 | 20px (pill) | 20px | Friends, Family 등 |
+| CTA 버튼 | 24px (pill) | — | Get started |
+| 보조 버튼 | 20px (pill) | — | More |
+
+### 3.5 상단 헤더 패턴
 
 ```
-[헤더]  display: flex, justifyContent: space-between, mb: 4
+[헤더]  display: flex, justifyContent: space-between, alignItems: center, mb: 4
   ├── [좌측] 페이지 제목 (h1)
-  └── [우측] 알림 아이콘 그룹 + 아바타 그룹 (+버튼)
+  └── [우측] 알림/메일/화면 아이콘 그룹 + 아바타 그룹
 ```
 
 ```jsx
@@ -406,12 +241,35 @@ sx={{
   <Avatar src='/user1.jpg' />
   <Avatar src='/user2.jpg' />
 </AvatarGroup>
-<Avatar sx={{ width: 32, height: 32, fontSize: '1rem' }}>+</Avatar>
+```
+
+### 3.6 사이드바 메뉴 아이템 간격
+
+```jsx
+// 사이드바 래퍼
+sx={{
+  width: '210px',
+  minHeight: '100vh',
+  p: 3,
+  display: 'flex',
+  flexDirection: 'column',
+  borderRadius: '20px 0 0 20px',
+}}
+
+// 메뉴 아이템
+sx={{
+  fontSize: '0.9375rem',
+  fontWeight: isActive ? 700 : 500,
+  py: 1.5,
+  px: 1,
+  borderRadius: '8px',
+  cursor: 'pointer',
+}}
 ```
 
 ---
 
-## 5. MUI 테마 적용 예시
+## 4. MUI 테마 적용 예시
 
 ```js
 import { createTheme } from '@mui/material/styles';
@@ -472,7 +330,7 @@ export default dashboardTheme;
 
 ---
 
-## 6. 디자인 특징 요약
+## 5. 디자인 특징 요약
 
 **전체 분위기**: 밝고 모던한 **헬스케어 / 피트니스 대시보드** 스타일
 

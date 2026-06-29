@@ -1,112 +1,51 @@
-import { useState } from 'react';
+import * as React from 'react';
 import Box from '@mui/material/Box';
+import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
-import Avatar from '@mui/material/Avatar';
-import AvatarGroup from '@mui/material/AvatarGroup';
-import IconButton from '@mui/material/IconButton';
-import Grid from '@mui/material/Grid';
-import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
-import SearchIcon from '@mui/icons-material/Search';
-import Sidebar from '../components/common/Sidebar';
-import HeroSection from '../components/dashboard/HeroSection';
-import QuickActions from '../components/dashboard/QuickActions';
-import CircleActivity from '../components/dashboard/CircleActivity';
-import WeeklyChart from '../components/dashboard/WeeklyChart';
-import WorkoutCards from '../components/dashboard/WorkoutCards';
-import TodayResults from '../components/dashboard/TodayResults';
+import Divider from '@mui/material/Divider';
+import CollectionsIcon from '@mui/icons-material/Collections';
+import FileUpload from '../components/ui/FileUpload';
+import ImageGallery from '../components/ui/ImageGallery';
 
 function DashboardPage() {
-  const [activeMenu, setActiveMenu] = useState('dashboard');
+  const [refreshKey, setRefreshKey] = React.useState(0);
+
+  const handleUploadSuccess = () => {
+    setRefreshKey((prev) => prev + 1);
+  };
 
   return (
     <Box
       sx={{
-        display: 'flex',
+        width: '100%',
         minHeight: '100vh',
-        bgcolor: '#FFFAF5',
+        bgcolor: 'grey.50',
+        py: { xs: 3, md: 5 },
       }}
     >
-      {/* 사이드바 */}
-      <Sidebar activeMenu={activeMenu} onMenuChange={setActiveMenu} />
-
-      {/* 메인 콘텐츠 */}
-      <Box
-        sx={{
-          flex: 1,
-          overflow: 'auto',
-          p: { xs: 2, md: 3 },
-          minWidth: 0,
-        }}
-      >
-        {/* 헤더 */}
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            mb: 4,
-          }}
-        >
-          <Typography variant='h1' sx={{ color: '#1A1A1A' }}>
-            Dashboard
-          </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <IconButton
-              size='small'
-              sx={{
-                bgcolor: '#FFFFFF',
-                boxShadow: '0 1px 6px rgba(0,0,0,0.08)',
-                '&:hover': { bgcolor: '#F8F8F8' },
-              }}
-            >
-              <SearchIcon sx={{ fontSize: 18 }} />
-            </IconButton>
-            <IconButton
-              size='small'
-              sx={{
-                bgcolor: '#FFFFFF',
-                boxShadow: '0 1px 6px rgba(0,0,0,0.08)',
-                '&:hover': { bgcolor: '#F8F8F8' },
-              }}
-            >
-              <NotificationsNoneIcon sx={{ fontSize: 18 }} />
-            </IconButton>
-            <AvatarGroup
-              max={3}
-              sx={{
-                ml: 0.5,
-                '& .MuiAvatar-root': {
-                  width: 32,
-                  height: 32,
-                  fontSize: '0.75rem',
-                  border: '2px solid #FFFAF5',
-                },
-              }}
-            >
-              <Avatar sx={{ bgcolor: '#72E040' }}>N</Avatar>
-              <Avatar sx={{ bgcolor: '#E84228' }}>K</Avatar>
-              <Avatar sx={{ bgcolor: '#F0956A' }}>J</Avatar>
-            </AvatarGroup>
+      <Container maxWidth='xl'>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
+          <CollectionsIcon sx={{ fontSize: 36, color: 'primary.main' }} />
+          <Box>
+            <Typography variant='h4' fontWeight={700} color='text.primary'>
+              이미지 갤러리
+            </Typography>
+            <Typography variant='body2' color='text.secondary'>
+              이미지를 업로드하고 공유하세요
+            </Typography>
           </Box>
         </Box>
 
-        {/* 2단 그리드 레이아웃 */}
-        <Grid container spacing={3}>
-          {/* 좌측 메인 */}
-          <Grid size={{ xs: 12, md: 7 }}>
-            <HeroSection />
-            <QuickActions />
-            <CircleActivity />
-          </Grid>
+        <FileUpload onUploadSuccess={handleUploadSuccess} />
 
-          {/* 우측 사이드 */}
-          <Grid size={{ xs: 12, md: 5 }}>
-            <WeeklyChart />
-            <WorkoutCards />
-            <TodayResults />
-          </Grid>
-        </Grid>
-      </Box>
+        <Divider sx={{ my: 4 }} />
+
+        <Typography variant='h6' fontWeight={600} color='text.primary' sx={{ mb: 2 }}>
+          업로드된 이미지
+        </Typography>
+
+        <ImageGallery refreshKey={refreshKey} />
+      </Container>
     </Box>
   );
 }
