@@ -22,7 +22,7 @@ function App() {
   const pageProps = { searchQuery, refreshKey };
 
   return (
-    <BrowserRouter basename='/fileshare'>
+    <BrowserRouter basename='/AI_VIBE_NK/fileshare'>
       <AppLayout
         onUploadClick={() => { document.activeElement?.blur(); setUploadOpen(true); }}
         onSearch={setSearchQuery}
