@@ -1,16 +1,14 @@
+'use client';
+
+import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
 import { Navigation } from '@/components/common/Navigation';
 import { FeedGrid } from '@/features/posts/FeedGrid';
-import { PostCardSkeleton } from '@/components/common/Skeleton';
 
-export const metadata = { title: '피드' };
-
-interface FeedPageProps {
-  searchParams: Promise<{ category?: string; page?: string }>;
-}
-
-export default async function FeedPage({ searchParams }: FeedPageProps) {
-  const params = await searchParams;
+function FeedContent() {
+  const searchParams = useSearchParams();
+  const category = searchParams.get('category') ?? undefined;
+  const page = Number(searchParams.get('page') ?? 1);
 
   return (
     <>
@@ -25,8 +23,13 @@ export default async function FeedPage({ searchParams }: FeedPageProps) {
             boxShadow: '6px 8px 0 var(--color-text-body)',
           }}
         >
-          <div className='absolute inset-0 opacity-10'
-            style={{ backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.4) 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
+          <div
+            className='absolute inset-0 opacity-10'
+            style={{
+              backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.4) 1px, transparent 1px)',
+              backgroundSize: '24px 24px',
+            }}
+          />
           <h1
             className='relative text-4xl md:text-5xl font-black mb-2'
             style={{ fontFamily: 'var(--font-display)', color: 'var(--color-text-body)' }}
@@ -41,18 +44,16 @@ export default async function FeedPage({ searchParams }: FeedPageProps) {
           </p>
         </div>
 
-        {/* Feed Grid */}
-        <Suspense
-          key={`${params.category}-${params.page}`}
-          fallback={
-            <div className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4'>
-              {Array.from({ length: 8 }).map((_, i) => <PostCardSkeleton key={i} />)}
-            </div>
-          }
-        >
-          <FeedGrid category={params.category} page={Number(params.page ?? 1)} />
-        </Suspense>
+        <FeedGrid category={category} page={page} />
       </div>
     </>
+  );
+}
+
+export default function FeedPage() {
+  return (
+    <Suspense fallback={<div className='h-screen' style={{ background: 'var(--color-bg)' }} />}>
+      <FeedContent />
+    </Suspense>
   );
 }

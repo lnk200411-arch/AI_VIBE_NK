@@ -34,7 +34,7 @@ export function EditForm({ post, categories }: EditFormProps) {
     setSaving(false);
     if (error) { toast.error('수정에 실패했어요.'); return; }
     toast.success('수정되었어요!');
-    router.push(`/posts/${post.id}`);
+    router.push(`/posts?id=${post.id}`);
     router.refresh();
   };
 
@@ -44,7 +44,7 @@ export function EditForm({ post, categories }: EditFormProps) {
         <h1 className='text-2xl font-black' style={{ fontFamily: 'var(--font-display)', color: 'var(--color-text-body)' }}>
           게시글 수정
         </h1>
-        <Link href={`/posts/${post.id}`} aria-label='취소'
+        <Link href={`/posts?id=${post.id}`} aria-label='취소'
           className='rounded-xl p-2 opacity-50 hover:opacity-100 transition-opacity'>
           <X size={20} />
         </Link>
@@ -87,7 +87,7 @@ export function EditForm({ post, categories }: EditFormProps) {
         </div>
 
         <div className='flex gap-3 pt-2'>
-          <Link href={`/posts/${post.id}`}
+          <Link href={`/posts?id=${post.id}`}
             className='flex-1 flex items-center justify-center rounded-2xl py-3 font-bold text-sm transition-all hover:opacity-80'
             style={{ border: '2px solid var(--color-border)', color: 'var(--color-text-muted)' }}>
             취소

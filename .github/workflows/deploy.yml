@@ -37,11 +37,21 @@ jobs:
         working-directory: lecture1/dashboard
         run: npm ci && npm run build
 
+      - name: Build my-community
+        working-directory: lecture1/my-community
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          NODE_ENV: production
+        run: npm ci && npm run build
+
       - name: Merge dist folders
         run: |
           mkdir -p dist
           cp -r lecture1/fileshare/dist dist/fileshare
           cp -r lecture1/dashboard/dist dist/dashboard
+          cp -r lecture1/my-community/out dist/my-community
+          cp lecture1/my-community/out/404.html dist/404.html
 
       - name: Setup Pages
         uses: actions/configure-pages@v4

@@ -1,8 +1,18 @@
+'use client';
+
+import { useQuery } from '@tanstack/react-query';
 import { fetchPosts } from '@/services/postsService';
 import { PostCard } from '@/components/common/PostCard';
+import { PostCardSkeleton } from '@/components/common/Skeleton';
 import Link from 'next/link';
 
-export async function SearchResults({ query }: { query: string }) {
+export function SearchResults({ query }: { query: string }) {
+  const { data, isLoading } = useQuery({
+    queryKey: ['search', query],
+    queryFn: () => fetchPosts({ search: query, sort: 'recent' }),
+    enabled: !!query.trim(),
+  });
+
   if (!query.trim()) {
     return (
       <div className='py-20 text-center'>
@@ -12,8 +22,15 @@ export async function SearchResults({ query }: { query: string }) {
     );
   }
 
-  const { data: posts } = await fetchPosts({ search: query, sort: 'recent' });
+  if (isLoading) {
+    return (
+      <div className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4'>
+        {Array.from({ length: 8 }).map((_, i) => <PostCardSkeleton key={i} />)}
+      </div>
+    );
+  }
 
+  const posts = data?.data;
   if (!posts?.length) {
     return (
       <div className='py-20 text-center'>

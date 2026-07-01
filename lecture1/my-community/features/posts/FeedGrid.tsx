@@ -1,19 +1,36 @@
-import { fetchPosts } from '@/services/postsService';
+'use client';
+
+import { useQuery } from '@tanstack/react-query';
 import { PostCard } from '@/components/common/PostCard';
-import { createClient } from '@/lib/supabase/server';
+import { PostCardSkeleton } from '@/components/common/Skeleton';
 import Link from 'next/link';
+import { fetchPosts } from '@/services/postsService';
+import { useAuthStore } from '@/store/authStore';
 
 interface FeedGridProps {
   category?: string;
   page: number;
 }
 
-export async function FeedGrid({ category, page }: FeedGridProps) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
+export function FeedGrid({ category, page }: FeedGridProps) {
+  const { user } = useAuthStore();
   const sort = category === 'popular' ? 'popular' : 'recent';
-  const { data: posts, meta } = await fetchPosts({ page, category, sort });
+
+  const { data: result, isLoading } = useQuery({
+    queryKey: ['posts', category, page],
+    queryFn: () => fetchPosts({ page, category, sort }),
+  });
+
+  if (isLoading) {
+    return (
+      <div className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4'>
+        {Array.from({ length: 8 }).map((_, i) => <PostCardSkeleton key={i} />)}
+      </div>
+    );
+  }
+
+  const posts = result?.data;
+  const meta = result?.meta;
 
   if (!posts || posts.length === 0) {
     return (
@@ -51,7 +68,6 @@ export async function FeedGrid({ category, page }: FeedGridProps) {
         ))}
       </div>
 
-      {/* Pagination */}
       {meta && meta.totalPages > 1 && (
         <div className='flex items-center justify-center gap-2 mt-10'>
           {Array.from({ length: meta.totalPages }).map((_, i) => {
@@ -67,17 +83,8 @@ export async function FeedGrid({ category, page }: FeedGridProps) {
                 className='h-9 w-9 flex items-center justify-center rounded-xl text-sm font-bold transition-all'
                 style={
                   isActive
-                    ? {
-                        background: 'var(--color-primary)',
-                        border: '2px solid var(--color-text-body)',
-                        boxShadow: '2px 2px 0 var(--color-text-body)',
-                        color: 'var(--color-text-body)',
-                      }
-                    : {
-                        background: 'var(--color-surface)',
-                        border: '2px solid var(--color-border)',
-                        color: 'var(--color-text-muted)',
-                      }
+                    ? { background: 'var(--color-primary)', border: '2px solid var(--color-text-body)', boxShadow: '2px 2px 0 var(--color-text-body)', color: 'var(--color-text-body)' }
+                    : { background: 'var(--color-surface)', border: '2px solid var(--color-border)', color: 'var(--color-text-muted)' }
                 }
               >
                 {p}

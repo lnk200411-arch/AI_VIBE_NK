@@ -1,35 +1,68 @@
-import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
+'use client';
+
+import { useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Bell, Heart, MessageCircle } from 'lucide-react';
 import Link from 'next/link';
+import { createClient } from '@/lib/supabase/client';
+import { useAuthStore } from '@/store/authStore';
 
-export const metadata = { title: '알림' };
+type NotifActor = { nickname: string; avatar_url: string | null } | null;
+type NotifPost = { id: string; title: string } | null;
+interface Notification {
+  id: string;
+  type: 'like' | 'comment' | 'follow';
+  is_read: boolean;
+  created_at: string;
+  actor: NotifActor;
+  post: NotifPost;
+}
 
-export default async function NotificationsPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login');
+const ICONS = { like: Heart, comment: MessageCircle, follow: Bell } as const;
+const MESSAGES = {
+  like: '님이 내 게시글을 좋아해요',
+  comment: '님이 댓글을 남겼어요',
+  follow: '님이 팔로우했어요',
+} as const;
 
-  const { data: notifications } = await supabase
-    .from('notifications')
-    .select(`
-      id, type, is_read, created_at,
-      actor:profiles!notifications_actor_id_fkey(nickname, avatar_url),
-      post:posts(id, title)
-    `)
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: false })
-    .limit(50);
+export default function NotificationsPage() {
+  const { user, isLoading } = useAuthStore();
+  const router = useRouter();
+  const queryClient = useQueryClient();
 
-  /* 알림 전체 읽음 처리 */
-  await supabase.from('notifications').update({ is_read: true }).eq('user_id', user.id).eq('is_read', false);
+  const { data: notifications } = useQuery<Notification[]>({
+    queryKey: ['notifications', user?.id],
+    queryFn: async () => {
+      const supabase = createClient();
+      const { data } = await supabase
+        .from('notifications')
+        .select(`
+          id, type, is_read, created_at,
+          actor:profiles!notifications_actor_id_fkey(nickname, avatar_url),
+          post:posts(id, title)
+        `)
+        .eq('user_id', user!.id)
+        .order('created_at', { ascending: false })
+        .limit(50);
+      return (data ?? []) as unknown as Notification[];
+    },
+    enabled: !!user,
+  });
 
-  const icons = { like: Heart, comment: MessageCircle, follow: Bell };
-  const messages = {
-    like: '님이 내 게시글을 좋아해요',
-    comment: '님이 댓글을 남겼어요',
-    follow: '님이 팔로우했어요',
-  };
+  const markAllRead = useCallback(async () => {
+    if (!user) return;
+    const supabase = createClient();
+    await supabase.from('notifications').update({ is_read: true }).eq('user_id', user.id).eq('is_read', false);
+    queryClient.invalidateQueries({ queryKey: ['notifications'] });
+  }, [user, queryClient]);
+
+  useEffect(() => {
+    if (!isLoading && !user) { router.replace('/login'); return; }
+    if (user) markAllRead();
+  }, [user, isLoading, router, markAllRead]);
+
+  if (isLoading || !user) return null;
 
   return (
     <div className='mx-auto max-w-lg px-4 py-8'>
@@ -43,38 +76,37 @@ export default async function NotificationsPage() {
           <p className='text-sm' style={{ color: 'var(--color-text-muted)' }}>아직 알림이 없어요</p>
         </div>
       ) : (
-        <ul className='space-y-1'>
-          {notifications.map((n: Record<string, unknown>) => {
-            const type = n.type as keyof typeof icons;
-            const Icon = icons[type] ?? Bell;
-            const actor = n.actor as { nickname: string; avatar_url: string } | null;
-            const post = n.post as { id: string; title: string } | null;
-
+        <ul className='space-y-2'>
+          {notifications.map((n) => {
+            const Icon = ICONS[n.type] ?? Bell;
             return (
-              <li key={String(n.id)}>
+              <li key={n.id}>
                 <Link
-                  href={post ? `/posts/${post.id}` : '#'}
+                  href={n.post ? `/posts?id=${n.post.id}` : '#'}
                   className='flex items-center gap-3 rounded-2xl p-4 transition-all hover:opacity-80'
                   style={{
-                    background: n.is_read ? 'var(--color-surface)' : 'var(--color-primary-50)',
+                    background: n.is_read ? 'var(--color-surface)' : 'var(--color-primary-50, #f0fce8)',
                     border: '2px solid var(--color-border)',
-                    marginBottom: '8px',
                   }}
                 >
                   <div
                     className='h-10 w-10 shrink-0 rounded-full overflow-hidden flex items-center justify-center font-bold'
                     style={{ background: 'var(--color-primary)', border: '2px solid var(--color-text-body)', color: 'var(--color-text-body)' }}
                   >
-                    {actor?.avatar_url
-                      ? <img src={actor.avatar_url} alt='' className='h-full w-full object-cover' />
-                      : actor?.nickname?.[0]?.toUpperCase()}
+                    {n.actor?.avatar_url
+                      ? <img src={n.actor.avatar_url} alt='' className='h-full w-full object-cover' />
+                      : n.actor?.nickname?.[0]?.toUpperCase()}
                   </div>
                   <div className='flex-1 min-w-0'>
                     <p className='text-sm leading-snug' style={{ color: 'var(--color-text-body)' }}>
-                      <span className='font-bold'>{actor?.nickname}</span>
-                      {messages[type]}
+                      <span className='font-bold'>{n.actor?.nickname}</span>
+                      {MESSAGES[n.type]}
                     </p>
-                    {post && <p className='text-xs truncate mt-0.5' style={{ color: 'var(--color-text-muted)' }}>{post.title}</p>}
+                    {n.post && (
+                      <p className='text-xs truncate mt-0.5' style={{ color: 'var(--color-text-muted)' }}>
+                        {n.post.title}
+                      </p>
+                    )}
                   </div>
                   <Icon size={16} style={{ color: 'var(--color-accent)', flexShrink: 0 }} />
                 </Link>

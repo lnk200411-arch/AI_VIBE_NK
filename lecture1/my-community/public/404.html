@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>PLAYFUL COMMUNITY</title>
+  <script type="text/javascript">
+    // SPA redirect for GitHub Pages
+    // Redirects missing paths under /AI_VIBE_NK/my-community/ back to the SPA entry point
+    (function() {
+      var basePath = '/AI_VIBE_NK/my-community';
+      var l = window.location;
+      if (l.pathname.indexOf(basePath) === 0) {
+        var remaining = l.pathname.slice(basePath.length);
+        l.replace(
+          l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+          basePath + '/?/' +
+          remaining.replace(/^\//, '').replace(/&/g, '~and~') +
+          (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
+          l.hash
+        );
+      }
+    })();
+  </script>
+</head>
+<body></body>
+</html>

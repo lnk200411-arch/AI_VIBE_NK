@@ -32,7 +32,7 @@ export function WriteForm({ userId, categories }: WriteFormProps) {
 
     if (error || !data) { toast.error('게시글 등록에 실패했어요.'); return; }
     toast.success('게시글이 등록되었어요! 🎉');
-    router.push(`/posts/${data.id}`);
+    router.push(`/posts?id=${data.id}`);
     router.refresh();
   };
 

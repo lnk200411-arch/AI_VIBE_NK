@@ -23,6 +23,21 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang='ko' className={notoSans.variable} suppressHydrationWarning>
+      <head>
+        {/* GitHub Pages SPA fallback: restore URL from 404.html redirect */}
+        <script dangerouslySetInnerHTML={{ __html: `
+          (function(l) {
+            if (l.search[1] === '/') {
+              var decoded = l.search.slice(1).split('&').map(function(s) {
+                return s.replace(/~and~/g, '&');
+              }).join('?');
+              window.history.replaceState(null, null,
+                l.pathname.slice(0, -1) + decoded + l.hash
+              );
+            }
+          }(window.location));
+        `}} />
+      </head>
       <body className='min-h-screen antialiased' style={{ background: 'var(--color-bg)' }}>
         <Providers>
           {children}

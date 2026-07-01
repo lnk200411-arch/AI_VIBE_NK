@@ -27,7 +27,7 @@ export function PostCard({ post, index = 0 }: PostCardProps) {
       whileHover={{ y: -6, rotate: rotation * 0.3, transition: { duration: 0.2 } }}
       className='group relative cursor-pointer'
     >
-      <Link href={`/posts/${post.id}`} aria-label={post.title}>
+      <Link href={`/posts?id=${post.id}`} aria-label={post.title}>
         <div
           className='overflow-hidden rounded-2xl'
           style={{

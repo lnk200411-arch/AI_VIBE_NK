@@ -1,15 +1,29 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { WriteForm } from '@/features/posts/WriteForm';
-import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
+import { useAuthStore } from '@/store/authStore';
+import type { CategoryRow } from '@/types';
 
-export const metadata = { title: '글쓰기' };
+export default function WritePage() {
+  const { user, isLoading } = useAuthStore();
+  const router = useRouter();
+  const [categories, setCategories] = useState<Pick<CategoryRow, 'id' | 'name' | 'slug'>[]>([]);
 
-export default async function WritePage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login?redirect=/write');
+  useEffect(() => {
+    if (!isLoading && !user) {
+      router.replace('/login');
+      return;
+    }
+    const supabase = createClient();
+    supabase.from('categories').select('id, name, slug').order('sort_order').then(({ data }) => {
+      if (data) setCategories(data);
+    });
+  }, [user, isLoading, router]);
 
-  const { data: categories } = await supabase.from('categories').select('id, name, slug').order('sort_order');
+  if (isLoading || !user) return null;
 
-  return <WriteForm userId={user.id} categories={categories ?? []} />;
+  return <WriteForm userId={user.id} categories={categories} />;
 }

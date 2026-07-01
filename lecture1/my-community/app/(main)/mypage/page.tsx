@@ -1,15 +1,28 @@
-import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { MyPageContent } from '@/features/mypage/MyPageContent';
+import { createClient } from '@/lib/supabase/client';
+import { useAuthStore } from '@/store/authStore';
+import type { ProfileRow } from '@/types';
 
-export const metadata = { title: '마이페이지' };
+export default function MyPage() {
+  const { user, isLoading } = useAuthStore();
+  const router = useRouter();
+  const [profile, setProfile] = useState<ProfileRow | null>(null);
 
-export default async function MyPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login?redirect=/mypage');
+  useEffect(() => {
+    if (isLoading) return;
+    if (!user) { router.replace('/login'); return; }
 
-  const { data: profile } = await supabase.from('profiles').select('*').eq('user_id', user.id).single();
+    const supabase = createClient();
+    supabase.from('profiles').select('*').eq('user_id', user.id).single().then(({ data }) => {
+      setProfile(data);
+    });
+  }, [user, isLoading, router]);
+
+  if (isLoading || !user) return null;
 
   return <MyPageContent userId={user.id} initialProfile={profile} />;
 }
